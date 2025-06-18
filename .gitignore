@@ -1,0 +1,50 @@
+# Build folders
+/build/
+/out/
+/bin/
+/lib/
+/src/output/
+/CMakeFiles/
+/CMakeCache.txt
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# VSCode settings
+.vscode/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Object and binary files
+*.o
+*.obj
+*.lo
+*.dll
+*.exe
+*.out
+*.so
+*.a
+*.lib
+*.pdb
+*.ilk
+
+# Logs
+*.log
+
+# MacOS / Linux / Windows system files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Generated files
+compile_commands.json
+
+# Temporary files
+*.tmp
+*.bak
+*~
