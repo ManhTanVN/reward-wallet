@@ -2,19 +2,48 @@
   "version": 3,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 21,
-    "patch": 0
+    "minor": 21
   },
   "configurePresets": [
     {
       "name": "default",
-      "displayName": "Default Windows Preset",
-      "description": "Use the default generator and release configuration",
-      "generator": "MinGW Makefiles",
-      "binaryDir": "${sourceDir}/build",
+      "displayName": "Default (Ninja)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/default",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "windows-mingw",
+      "displayName": "Windows (MinGW)",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/build/windows-mingw",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "macos-clang",
+      "displayName": "macOS (Clang)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/macos-clang",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_COMPILER": "/usr/bin/clang",
+        "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+        "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
       }
     }
   ],
@@ -22,12 +51,14 @@
     {
       "name": "default",
       "configurePreset": "default"
-    }
-  ],
-  "testPresets": [
+    },
     {
-      "name": "default",
-      "configurePreset": "default"
+      "name": "windows-mingw",
+      "configurePreset": "windows-mingw"
+    },
+    {
+      "name": "macos-clang",
+      "configurePreset": "macos-clang"
     }
   ]
 }

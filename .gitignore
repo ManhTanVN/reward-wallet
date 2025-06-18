@@ -10,8 +10,14 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 
+# Ignore everything in output
+/src/output/*
+
 # VSCode settings
 .vscode/
+
+# Ignore macOS-generated executable
+/main
 
 # User-specific files
 *.user
