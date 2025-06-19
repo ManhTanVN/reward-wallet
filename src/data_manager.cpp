@@ -25,7 +25,11 @@ std::string DataManager::getDataDirectory() const {
 void DataManager::ensureDataDirectoryExists() const {
     std::string dir = getDataDirectory();
     if (!dir.empty()) {
-        mkdir(dir.c_str());
+    #ifdef _WIN32
+        _mkdir(dir.c_str());  // Windows
+    #else
+        mkdir(dir.c_str(), 0755);  // macOS/Linux
+    #endif
     }
 }
 
