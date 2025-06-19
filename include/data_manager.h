@@ -5,9 +5,15 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include <filesystem>
+#include <fstream>
 
-namespace fs = std::filesystem;
+#if defined(_WIN32)
+#include <direct.h>
+#define mkdir _mkdir
+#else
+#include <sys/stat.h>
+#endif
+
 using json = nlohmann::json;
 
 class DataManager
@@ -26,8 +32,8 @@ public:
     static bool verifyPassword(const std::string &password, const std::string &hash);
 
 private:
-    fs::path dataPath_;
-    fs::path getDataDirectory() const;
+    std::string dataPath_;
+    std::string getDataDirectory() const;
     void ensureDataDirectoryExists() const;
     void writeJsonToFile(const json &j) const;
     json readJsonFromFile() const;

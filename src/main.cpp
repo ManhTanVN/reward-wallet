@@ -1,8 +1,8 @@
-#include <iostream>
 #include "cli.h"
+#include "data_manager.h"
 
-int main()
-{
-    printMessage();  // Call the function from cli.cpp
+int main() {
+    DataManager manager;
+    handleUserInput(manager);
     return 0;
 }

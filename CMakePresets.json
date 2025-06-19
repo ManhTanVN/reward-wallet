@@ -7,8 +7,8 @@
   "configurePresets": [
     {
       "name": "default",
-      "displayName": "Default (Ninja)",
-      "generator": "Ninja",
+      "displayName": "Default (MinGW)",
+      "generator": "MinGW Makefiles",
       "binaryDir": "${sourceDir}/build/default",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",

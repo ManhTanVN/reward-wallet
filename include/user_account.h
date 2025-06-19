@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <chrono>
 
 enum class AccountStatus
 {
@@ -21,26 +22,26 @@ public:
         const std::string &password);
 
     // Getters
-    std::string getFullName() const { return fullName_; }
-    std::string getEmail() const { return email_; }
-    std::string getIdNumber() const { return idNumber_; }
-    std::string getUsername() const { return username_; }
-    std::string getHashedPassword() const { return hashedPassword_; }
-    AccountStatus getStatus() const { return status_; }
-    bool isTempPassword() const { return isTempPassword_; }
-    std::chrono::system_clock::time_point getCreationDate() const { return creationDate_; }
+    std::string getFullName() const;
+    std::string getEmail() const;
+    std::string getIdNumber() const;
+    std::string getUsername() const;
+    std::string getHashedPassword() const;
+    AccountStatus getStatus() const;
+    bool isUsingTempPassword() const;
+    std::chrono::system_clock::time_point getCreationDate() const;
 
     // Setters
     void setFullName(const std::string &fullName);
     void setEmail(const std::string &email);
-    void setPassword(const std::string &password);
-    void setHashedPassword(const std::string &hashedPassword);
+    void setPassword(const std::string &password);                 // Gọi hash bên DataManager
+    void setHashedPassword(const std::string &hashedPassword);     // Dành cho việc load từ file
     void setStatus(AccountStatus status);
     void setTempPassword(bool isTemp);
+    void setCreationDate(const std::chrono::system_clock::time_point &date);
 
-    // Password validation and management
+    // Password validation and generation
     bool validatePassword(const std::string &password) const;
-    static std::string hashPassword(const std::string &password);
     static bool isPasswordValid(const std::string &password);
     static std::string generateTempPassword();
 
