@@ -6,34 +6,24 @@
 #include <stdexcept>
 #include <iostream>
 #include <algorithm>
-
-#ifdef _WIN32
-#include <direct.h>
-#else
-#include <sys/stat.h>
-#endif
+#include <random>
 
 // ---------------------- Constructor & Filesystem -----------------------
 
 DataManager::DataManager(const std::string &dataPath)
-    : dataPath_(dataPath)
-{
+    : dataPath_(dataPath) {
     ensureDataDirectoryExists();
 }
 
-std::string DataManager::getDataDirectory() const
-{
+std::string DataManager::getDataDirectory() const {
     size_t slash = dataPath_.find_last_of("/\\");
-    if (slash == std::string::npos)
-        return "";
+    if (slash == std::string::npos) return "";
     return dataPath_.substr(0, slash);
 }
 
-void DataManager::ensureDataDirectoryExists() const
-{
+void DataManager::ensureDataDirectoryExists() const {
     std::string dir = getDataDirectory();
-    if (!dir.empty())
-    {
+    if (!dir.empty()) {
 #ifdef _WIN32
         _mkdir(dir.c_str());
 #else
@@ -42,21 +32,15 @@ void DataManager::ensureDataDirectoryExists() const
     }
 }
 
-void DataManager::writeJsonToFile(const json &j) const
-{
+void DataManager::writeJsonToFile(const json &j) const {
     std::ofstream file(dataPath_);
-    if (!file)
-    {
-        throw std::runtime_error("Cannot open file for writing: " + dataPath_);
-    }
+    if (!file) throw std::runtime_error("Cannot open file for writing: " + dataPath_);
     file << std::setw(4) << j << std::endl;
 }
 
-json DataManager::readJsonFromFile() const
-{
+json DataManager::readJsonFromFile() const {
     std::ifstream file(dataPath_);
-    if (!file)
-        return json::array();
+    if (!file) return json::array();
     json j;
     file >> j;
     return j;
@@ -64,55 +48,46 @@ json DataManager::readJsonFromFile() const
 
 // ---------------------- Cache Management -----------------------
 
-void DataManager::loadCache()
-{
-    if (cacheLoaded_)
-        return;
+void DataManager::loadCache() {
+    if (cacheLoaded_) return;
 
     auto users = loadAllUsers();
-    for (const auto &user : users)
-    {
+    for (const auto &user : users) {
         userMap_[user->getUsername()] = user;
     }
     cacheLoaded_ = true;
 }
 
-void DataManager::clearCache()
-{
+void DataManager::clearCache() {
     userMap_.clear();
     cacheLoaded_ = false;
 }
 
 // ---------------------- User Operations -----------------------
 
-void DataManager::saveUser(const std::shared_ptr<UserAccount> &user)
-{
+void DataManager::saveUser(const std::shared_ptr<UserAccount> &user) {
     loadCache();
     userMap_[user->getUsername()] = user;
 
     std::vector<std::shared_ptr<UserAccount>> users;
-    for (const auto &[username, u] : userMap_)
-    {
+    for (const auto &[username, u] : userMap_) {
         users.push_back(u);
     }
     saveAllUsers(users);
 }
 
-void DataManager::removeUser(const std::string &username)
-{
+void DataManager::removeUser(const std::string &username) {
     loadCache();
     userMap_.erase(username);
 
     std::vector<std::shared_ptr<UserAccount>> users;
-    for (const auto &[username, u] : userMap_)
-    {
+    for (const auto &[username, u] : userMap_) {
         users.push_back(u);
     }
     saveAllUsers(users);
 }
 
-std::shared_ptr<UserAccount> DataManager::findUser(const std::string &username)
-{
+std::shared_ptr<UserAccount> DataManager::findUser(const std::string &username) {
     loadCache();
     auto it = userMap_.find(username);
     if (it != userMap_.end())
@@ -120,22 +95,18 @@ std::shared_ptr<UserAccount> DataManager::findUser(const std::string &username)
     return nullptr;
 }
 
-std::vector<std::shared_ptr<UserAccount>> DataManager::loadAllUsers()
-{
+std::vector<std::shared_ptr<UserAccount>> DataManager::loadAllUsers() {
     json jArr = readJsonFromFile();
     std::vector<std::shared_ptr<UserAccount>> users;
-    for (const auto &j : jArr)
-    {
+    for (const auto &j : jArr) {
         users.push_back(jsonToUser(j));
     }
     return users;
 }
 
-void DataManager::saveAllUsers(const std::vector<std::shared_ptr<UserAccount>> &users)
-{
+void DataManager::saveAllUsers(const std::vector<std::shared_ptr<UserAccount>> &users) {
     json jArr = json::array();
-    for (const auto &user : users)
-    {
+    for (const auto &user : users) {
         jArr.push_back(userToJson(user));
     }
     writeJsonToFile(jArr);
@@ -143,20 +114,17 @@ void DataManager::saveAllUsers(const std::vector<std::shared_ptr<UserAccount>> &
 
 // ---------------------- Password Hashing -----------------------
 
-std::string DataManager::hashPassword(const std::string &password)
-{
+std::string DataManager::hashPassword(const std::string &password) {
     return sha256(password);
 }
 
-bool DataManager::verifyPassword(const std::string &password, const std::string &hash)
-{
+bool DataManager::verifyPassword(const std::string &password, const std::string &hash) {
     return hashPassword(password) == hash;
 }
 
 // ---------------------- JSON Conversion -----------------------
 
-json DataManager::userToJson(const std::shared_ptr<UserAccount> &user) const
-{
+json DataManager::userToJson(const std::shared_ptr<UserAccount> &user) const {
     return {
         {"fullName", user->getFullName()},
         {"email", user->getEmail()},
@@ -166,23 +134,37 @@ json DataManager::userToJson(const std::shared_ptr<UserAccount> &user) const
         {"status", static_cast<int>(user->getStatus())},
         {"isTempPassword", user->isUsingTempPassword()},
         {"creationDate", std::chrono::duration_cast<std::chrono::seconds>(
-                             user->getCreationDate().time_since_epoch())
-                             .count()}};
+                             user->getCreationDate().time_since_epoch()).count()},
+        {"role", static_cast<int>(user->getRole())},
+        {"walletAddress", user->getWalletAddress()},
+        {"pointBalance", user->getPointBalance()},
+        {"transactionHistory", user->getTransactionHistory()}
+    };
 }
 
-std::shared_ptr<UserAccount> DataManager::jsonToUser(const json &j) const
-{
+std::shared_ptr<UserAccount> DataManager::jsonToUser(const json &j) const {
     auto user = std::make_shared<UserAccount>(
         j.at("fullName"),
         j.at("email"),
         j.at("idNumber"),
         j.at("username"),
         "");
+
     user->setHashedPassword(j.at("hashedPassword"));
     user->setStatus(static_cast<AccountStatus>(j.at("status")));
     user->setTempPassword(j.at("isTempPassword"));
     std::chrono::system_clock::time_point creation =
         std::chrono::system_clock::time_point(std::chrono::seconds(j.at("creationDate")));
     user->setCreationDate(creation);
+
+    if (j.contains("role"))
+        user->setRole(static_cast<UserRole>(j.at("role")));
+    if (j.contains("walletAddress"))
+        user->setWalletAddress(j.at("walletAddress"));
+    if (j.contains("pointBalance"))
+        user->setPointBalance(j.at("pointBalance"));
+    if (j.contains("transactionHistory"))
+        user->setTransactionHistory(j.at("transactionHistory").get<std::vector<std::string>>());
+
     return user;
 }
