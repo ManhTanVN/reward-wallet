@@ -1,0 +1,58 @@
+[
+    {
+        "creationDate": 1750658197,
+        "email": "ctran@gmail.com",
+        "fullName": "Tran Thi C",
+        "hashedPassword": "f7c29a7849be655d15440e83e94ac3f024ac23fb8b70bee1a1751c9b41cc383b",
+        "idNumber": "341234324",
+        "isTempPassword": true,
+        "pointBalance": 1000,
+        "role": 1,
+        "status": 2,
+        "transactionHistory": [],
+        "username": "ctran",
+        "walletAddress": "0x44DC54D7E86A"
+    },
+    {
+        "creationDate": 1750658151,
+        "email": "bnguyen@gmail.com",
+        "fullName": "Nguyen Van B",
+        "hashedPassword": "c88d1d5b768bef36744e9ea17cb1d2f240445bc6b38550273524ae122d77d41a",
+        "idNumber": "131234123",
+        "isTempPassword": true,
+        "pointBalance": 1000,
+        "role": 1,
+        "status": 2,
+        "transactionHistory": [],
+        "username": "bnguyen",
+        "walletAddress": "0xE615BC56B440"
+    },
+    {
+        "creationDate": 1750657951,
+        "email": "admin@example.com",
+        "fullName": "Administrator",
+        "hashedPassword": "e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7",
+        "idNumber": "000000000",
+        "isTempPassword": false,
+        "pointBalance": 1000,
+        "role": 0,
+        "status": 0,
+        "transactionHistory": [],
+        "username": "admin",
+        "walletAddress": "0xC8906F90B183"
+    },
+    {
+        "creationDate": 1750656903,
+        "email": "tannv.k55v@gmail.com",
+        "fullName": "nguyen van tan",
+        "hashedPassword": "c9ac01bfd5654a423f1489f463eee5b67e0b27477056186f70fea3cd5c0cc993",
+        "idNumber": "123456",
+        "isTempPassword": false,
+        "pointBalance": 1000,
+        "role": 1,
+        "status": 2,
+        "transactionHistory": [],
+        "username": "tannguyen",
+        "walletAddress": "0x232205BC5CB7"
+    }
+]
