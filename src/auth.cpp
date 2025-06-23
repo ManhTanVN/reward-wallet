@@ -1,18 +1,22 @@
 #include "auth.h"
 #include <iostream>
 
-std::shared_ptr<UserAccount> authenticateUser(DataManager& manager, const std::string& username, const std::string& password) {
+std::shared_ptr<UserAccount> authenticateUser(DataManager &manager, const std::string &username, const std::string &password)
+{
     auto user = manager.findUser(username);
-    if (user && user->validatePassword(password)) {
+    if (user && user->validatePassword(password))
+    {
         return user;
     }
     return nullptr;
 }
 
-bool requirePasswordChange(std::shared_ptr<UserAccount> user) {
+bool requirePasswordChange(std::shared_ptr<UserAccount> user)
+{
     return user->isUsingTempPassword();
 }
 
+// Comment to prevent override
 // void changePassword(std::shared_ptr<UserAccount> user, DataManager& manager) {
 //     std::string newPassword;
 //     std::cout << "Enter new password: ";
