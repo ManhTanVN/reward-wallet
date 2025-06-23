@@ -13,6 +13,9 @@ install_manifest.txt
 # Ignore everything in output
 /src/output/*
 
+# Ignore everything in data
+/data/*
+
 # VSCode settings
 .vscode/
 

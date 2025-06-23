@@ -10,7 +10,8 @@
 #include <cstdint>
 #include <array>
 
-namespace {
+namespace
+{
     constexpr std::array<uint32_t, 64> k = {
         0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
         0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -27,39 +28,46 @@ namespace {
         0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5,
         0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
         0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
-        0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
-    };
+        0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
 
-    inline uint32_t rotr(uint32_t x, uint32_t n) {
+    inline uint32_t rotr(uint32_t x, uint32_t n)
+    {
         return (x >> n) | (x << (32 - n));
     }
 
-    inline uint32_t ch(uint32_t x, uint32_t y, uint32_t z) {
+    inline uint32_t ch(uint32_t x, uint32_t y, uint32_t z)
+    {
         return (x & y) ^ (~x & z);
     }
 
-    inline uint32_t maj(uint32_t x, uint32_t y, uint32_t z) {
+    inline uint32_t maj(uint32_t x, uint32_t y, uint32_t z)
+    {
         return (x & y) ^ (x & z) ^ (y & z);
     }
 
-    inline uint32_t big_sigma0(uint32_t x) {
+    inline uint32_t big_sigma0(uint32_t x)
+    {
         return rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22);
     }
 
-    inline uint32_t big_sigma1(uint32_t x) {
+    inline uint32_t big_sigma1(uint32_t x)
+    {
         return rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25);
     }
 
-    inline uint32_t small_sigma0(uint32_t x) {
+    inline uint32_t small_sigma0(uint32_t x)
+    {
         return rotr(x, 7) ^ rotr(x, 18) ^ (x >> 3);
     }
 
-    inline uint32_t small_sigma1(uint32_t x) {
+    inline uint32_t small_sigma1(uint32_t x)
+    {
         return rotr(x, 17) ^ rotr(x, 19) ^ (x >> 10);
     }
 }
 
-std::string sha256(const std::string& input) {
+std::string sha256(const std::string &input)
+{
     uint64_t l = input.size() * 8;
     std::vector<uint8_t> data(input.begin(), input.end());
     data.push_back(0x80);
@@ -72,18 +80,20 @@ std::string sha256(const std::string& input) {
     uint32_t h[8] = {
         0x6a09e667, 0xbb67ae85, 0x3c6ef372,
         0xa54ff53a, 0x510e527f, 0x9b05688c,
-        0x1f83d9ab, 0x5be0cd19
-    };
+        0x1f83d9ab, 0x5be0cd19};
 
-    for (size_t i = 0; i < data.size(); i += 64) {
+    for (size_t i = 0; i < data.size(); i += 64)
+    {
         uint32_t w[64];
-        for (int t = 0; t < 16; ++t) {
+        for (int t = 0; t < 16; ++t)
+        {
             w[t] = (data[i + t * 4] << 24) |
                    (data[i + t * 4 + 1] << 16) |
                    (data[i + t * 4 + 2] << 8) |
                    (data[i + t * 4 + 3]);
         }
-        for (int t = 16; t < 64; ++t) {
+        for (int t = 16; t < 64; ++t)
+        {
             w[t] = small_sigma1(w[t - 2]) + w[t - 7] +
                    small_sigma0(w[t - 15]) + w[t - 16];
         }
@@ -91,7 +101,8 @@ std::string sha256(const std::string& input) {
         uint32_t a = h[0], b = h[1], c = h[2], d = h[3];
         uint32_t e = h[4], f = h[5], g = h[6], hval = h[7];
 
-        for (int t = 0; t < 64; ++t) {
+        for (int t = 0; t < 64; ++t)
+        {
             uint32_t t1 = hval + big_sigma1(e) + ch(e, f, g) + k[t] + w[t];
             uint32_t t2 = big_sigma0(a) + maj(a, b, c);
             hval = g;
@@ -104,8 +115,14 @@ std::string sha256(const std::string& input) {
             a = t1 + t2;
         }
 
-        h[0] += a; h[1] += b; h[2] += c; h[3] += d;
-        h[4] += e; h[5] += f; h[6] += g; h[7] += hval;
+        h[0] += a;
+        h[1] += b;
+        h[2] += c;
+        h[3] += d;
+        h[4] += e;
+        h[5] += f;
+        h[6] += g;
+        h[7] += hval;
     }
 
     std::stringstream ss;
