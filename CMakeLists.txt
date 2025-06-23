@@ -16,6 +16,8 @@ set(SOURCES
     src/data_manager.cpp
     src/user_account.cpp
     src/sha256.cpp
+    src/auth.cpp
+    src/wallet.cpp
 )
 
 set(HEADERS
@@ -24,6 +26,8 @@ set(HEADERS
     include/data_manager.h
     include/user_account.h
     include/sha256.h
+    include/auth.h
+    include/wallet.h
 )
 
 # Add executable
