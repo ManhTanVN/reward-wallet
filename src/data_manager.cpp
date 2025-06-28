@@ -128,7 +128,6 @@ json DataManager::userToJson(const std::shared_ptr<UserAccount> &user) const {
     return {
         {"fullName", user->getFullName()},
         {"email", user->getEmail()},
-        {"idNumber", user->getIdNumber()},
         {"username", user->getUsername()},
         {"hashedPassword", user->getHashedPassword()},
         {"status", static_cast<int>(user->getStatus())},
@@ -146,9 +145,9 @@ std::shared_ptr<UserAccount> DataManager::jsonToUser(const json &j) const {
     auto user = std::make_shared<UserAccount>(
         j.at("fullName"),
         j.at("email"),
-        j.at("idNumber"),
         j.at("username"),
-        "");
+        ""  // password không cần thiết vì sẽ set hashed password bên dưới
+    );
 
     user->setHashedPassword(j.at("hashedPassword"));
     user->setStatus(static_cast<AccountStatus>(j.at("status")));

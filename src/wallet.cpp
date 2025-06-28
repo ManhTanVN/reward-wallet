@@ -1,4 +1,5 @@
 #include "wallet.h"
+#include "otp.h"
 #include <iostream>
 #include <ctime>
 #include <sstream>
@@ -32,6 +33,22 @@ bool transferPoints(DataManager& manager,
     if (!from || !to) return false;
     if (from->getPointBalance() < amount) return false;
 
+    // ✅ Bỏ qua OTP nếu là ví master
+    if (from->getUsername() != "__master__wallet__") {
+        std::string otp = OTPManager::generateOTP();
+        from->setOTP(otp);
+        manager.saveUser(from);
+        std::cout << "[OTP] Verification required. Your OTP: " << otp << "\n";
+
+        std::string input;
+        std::cout << "Enter OTP to confirm transfer: ";
+        std::getline(std::cin, input);
+        if (!from->verifyOTP(input)) {
+            std::cout << "[ERROR] Invalid OTP. Transfer aborted.\n";
+            return false;
+        }
+    }
+
     from->setPointBalance(from->getPointBalance() - amount);
     to->setPointBalance(to->getPointBalance() + amount);
 
@@ -51,7 +68,7 @@ bool transferPoints(DataManager& manager,
         {"note", "Received at " + time}
     };
 
-    from->addTransaction(sendLog.dump());     // lưu chuỗi JSON
+    from->addTransaction(sendLog.dump());
     to->addTransaction(receiveLog.dump());
 
     manager.saveUser(from);

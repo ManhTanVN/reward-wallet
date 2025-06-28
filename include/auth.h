@@ -5,11 +5,8 @@
 #include <string>
 #include <memory>
 
-// Đăng nhập
+// Đăng nhập (bao gồm xác thực mật khẩu và OTP)
 std::shared_ptr<UserAccount> authenticateUser(DataManager& manager, const std::string& username, const std::string& password);
 
-// Kiểm tra có đang dùng mật khẩu tạm không
+// Kiểm tra xem user có đang dùng mật khẩu tạm không
 bool requirePasswordChange(std::shared_ptr<UserAccount> user);
-
-// Đổi mật khẩu (nếu cần cập nhật mật khẩu ngay trong CLI)
-// void changePassword(std::shared_ptr<UserAccount> user, DataManager& manager);

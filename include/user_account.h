@@ -11,24 +11,28 @@ class UserAccount {
 public:
     UserAccount(const std::string &fullName,
                 const std::string &email,
-                const std::string &idNumber,
                 const std::string &username,
                 const std::string &password);
 
-    // Getters
-    std::string getFullName() const;
-    std::string getEmail() const;
-    std::string getIdNumber() const;
-    std::string getUsername() const;
-    std::string getHashedPassword() const;
-    AccountStatus getStatus() const;
-    UserRole getRole() const;
-    bool isUsingTempPassword() const;
-    std::chrono::system_clock::time_point getCreationDate() const;
-
-    std::string getWalletAddress() const;
-    int getPointBalance() const;
-    const std::vector<std::string>& getTransactionHistory() const;
+                
+                // Getters
+                std::string getFullName() const;
+                std::string getEmail() const;
+                std::string getUsername() const;
+                std::string getHashedPassword() const;
+                AccountStatus getStatus() const;
+                UserRole getRole() const;
+                bool isUsingTempPassword() const;
+                std::chrono::system_clock::time_point getCreationDate() const;
+                
+                
+                
+                std::string getWalletAddress() const;
+                int getPointBalance() const;
+                const std::vector<std::string>& getTransactionHistory() const;
+    // OTP
+    void setOTP(const std::string& otp, int ttlSeconds = 300);
+    bool verifyOTP(const std::string& input) const;
 
     // Setters
     void setFullName(const std::string &fullName);
@@ -52,7 +56,7 @@ public:
     static std::string generateTempPassword();
 
 private:
-    std::string fullName_, email_, idNumber_, username_, hashedPassword_;
+    std::string fullName_, email_, username_, hashedPassword_;
     AccountStatus status_;
     UserRole role_;
     bool isTempPassword_;
@@ -63,4 +67,8 @@ private:
     std::vector<std::string> transactionHistory_;
 
     static std::string generateWalletAddress();  // Private helper
+
+    // OTP
+    std::string currentOTP_;
+    std::chrono::system_clock::time_point otpExpiry_;
 };

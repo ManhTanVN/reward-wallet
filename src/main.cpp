@@ -8,21 +8,18 @@
 
 // Hàm tạo tài khoản admin mặc định nếu chưa có
 void ensureDefaultAdmin(DataManager& manager) {
-    std::string defaultAdminUsername = "admin";
+    const std::string defaultAdminUsername = "admin";
 
-    // Kiểm tra xem admin đã tồn tại chưa
     auto existingAdmin = manager.findUser(defaultAdminUsername);
     if (existingAdmin) {
         std::cout << "[✓] Default admin already exists.\n";
         return;
     }
 
-    // Nếu chưa tồn tại, tạo mới
     std::string password = "Admin@123";
     auto admin = std::make_shared<UserAccount>(
         "Administrator",
         "admin@example.com",
-        "000000000",
         defaultAdminUsername,
         password
     );
@@ -37,13 +34,36 @@ void ensureDefaultAdmin(DataManager& manager) {
     std::cout << "    Password: " << password << "\n";
 }
 
+// Hàm tạo ví tổng nếu chưa có
+void ensureMasterWalletExists(DataManager& manager) {
+    const std::string masterUsername = "__master__wallet__";
+
+    if (manager.findUser(masterUsername)) {
+        std::cout << "Master wallet already exists.\n";
+        return;
+    }
+
+    auto master = std::make_shared<UserAccount>(
+        "System Wallet",
+        "system@wallet.com",
+        masterUsername,
+        "Master@123!"
+    );
+    master->setRole(UserRole::ADMIN);
+    master->setPointBalance(10000);    // điểm gốc
+    master->setStatus(AccountStatus::ACTIVE);
+
+    manager.saveUser(master);
+
+    std::cout << "[Init] Master wallet created with 10,000 points.\n";
+}
+
 int main() {
     DataManager manager;
 
-    // Tạo admin mặc định nếu chưa tồn tại
     ensureDefaultAdmin(manager);
+    ensureMasterWalletExists(manager);
 
-    // Chạy giao diện người dùng
     handleUserInput(manager);
 
     return 0;

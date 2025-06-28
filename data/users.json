@@ -1,58 +1,82 @@
 [
     {
-        "creationDate": 1750658197,
-        "email": "ctran@gmail.com",
-        "fullName": "Tran Thi C",
-        "hashedPassword": "f7c29a7849be655d15440e83e94ac3f024ac23fb8b70bee1a1751c9b41cc383b",
-        "idNumber": "341234324",
-        "isTempPassword": true,
-        "pointBalance": 1000,
+        "creationDate": 1751113866,
+        "email": "anguyen@gmail.com",
+        "fullName": "nguyen van a",
+        "hashedPassword": "c387b222a52a3f4cfc689dd4b1200e6d0dc78363e3c387f81d2496a69ec6be60",
+        "isTempPassword": false,
+        "pointBalance": 2500,
         "role": 1,
         "status": 2,
-        "transactionHistory": [],
-        "username": "ctran",
-        "walletAddress": "0x44DC54D7E86A"
+        "transactionHistory": [
+            "{\"amount\":1000,\"incoming\":true,\"note\":\"Received at 2025-06-28 19:31:06\",\"otherWallet\":\"0xBA2646B251C8\"}",
+            "{\"amount\":1000,\"incoming\":true,\"note\":\"Buy points\",\"otherWallet\":\"0xBA2646B251C8\",\"timestamp\":\"2025-06-28 20:35:03\",\"type\":\"buy\"}",
+            "{\"amount\":500,\"incoming\":true,\"note\":\"Buy points\",\"otherWallet\":\"0xBA2646B251C8\",\"timestamp\":\"2025-06-28 20:40:27\",\"type\":\"buy\"}"
+        ],
+        "username": "anguyen",
+        "walletAddress": "0x24941B10A6E9"
     },
     {
-        "creationDate": 1750658151,
-        "email": "bnguyen@gmail.com",
-        "fullName": "Nguyen Van B",
-        "hashedPassword": "c88d1d5b768bef36744e9ea17cb1d2f240445bc6b38550273524ae122d77d41a",
-        "idNumber": "131234123",
-        "isTempPassword": true,
-        "pointBalance": 1000,
-        "role": 1,
-        "status": 2,
-        "transactionHistory": [],
-        "username": "bnguyen",
-        "walletAddress": "0xE615BC56B440"
+        "creationDate": 1751113824,
+        "email": "system@wallet.com",
+        "fullName": "System Wallet",
+        "hashedPassword": "8e44c1a2c4a3b785e2b601f228966e5cd2d9f5e67e6e96ad98c5ad3127098648",
+        "isTempPassword": false,
+        "pointBalance": 7500,
+        "role": 0,
+        "status": 0,
+        "transactionHistory": [
+            "{\"amount\":1000,\"incoming\":false,\"note\":\"Sent at 2025-06-28 19:31:06\",\"otherWallet\":\"0x24941B10A6E9\"}",
+            "{\"amount\":500,\"incoming\":true,\"note\":\"Mint points for user purchase\",\"otherWallet\":\"SYSTEM\",\"timestamp\":\"2025-06-28 20:40:27\",\"type\":\"mint\"}",
+            "{\"amount\":500,\"incoming\":false,\"note\":\"Send bought points to user\",\"otherWallet\":\"0x24941B10A6E9\",\"timestamp\":\"2025-06-28 20:40:27\",\"type\":\"buy\"}",
+            "{\"amount\":1000,\"incoming\":false,\"note\":\"Sent at 2025-06-28 20:46:09\",\"otherWallet\":\"0xA5FFA88DB7B7\"}",
+            "{\"amount\":1000,\"incoming\":false,\"note\":\"Sent at 2025-06-28 20:46:36\",\"otherWallet\":\"0x7F8602352F7D\"}",
+            "{\"amount\":1000,\"incoming\":false,\"note\":\"Sent at 2025-06-28 20:50:39\",\"otherWallet\":\"0x152055D89875\"}"
+        ],
+        "username": "__master__wallet__",
+        "walletAddress": "0xBA2646B251C8"
     },
     {
-        "creationDate": 1750657951,
+        "creationDate": 1751113824,
         "email": "admin@example.com",
         "fullName": "Administrator",
         "hashedPassword": "e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7",
-        "idNumber": "000000000",
         "isTempPassword": false,
-        "pointBalance": 1000,
+        "pointBalance": 0,
         "role": 0,
         "status": 0,
         "transactionHistory": [],
         "username": "admin",
-        "walletAddress": "0xC8906F90B183"
+        "walletAddress": "0xDCFBFA580D7B"
     },
     {
-        "creationDate": 1750656903,
-        "email": "tannv.k55v@gmail.com",
-        "fullName": "nguyen van tan",
-        "hashedPassword": "c9ac01bfd5654a423f1489f463eee5b67e0b27477056186f70fea3cd5c0cc993",
-        "idNumber": "123456",
-        "isTempPassword": false,
+        "creationDate": 1751118369,
+        "email": "enguyen@gmail.com",
+        "fullName": "nguyen van e",
+        "hashedPassword": "4e7d02993fe6d272254ec1a5a6efa23e4b7e87e3ca89263b58030f43177bf5d2",
+        "isTempPassword": true,
         "pointBalance": 1000,
         "role": 1,
         "status": 2,
-        "transactionHistory": [],
-        "username": "tannguyen",
-        "walletAddress": "0x232205BC5CB7"
+        "transactionHistory": [
+            "{\"amount\":1000,\"incoming\":true,\"note\":\"Received at 2025-06-28 20:46:09\",\"otherWallet\":\"0xBA2646B251C8\"}"
+        ],
+        "username": "enguyen",
+        "walletAddress": "0xA5FFA88DB7B7"
+    },
+    {
+        "creationDate": 1751118396,
+        "email": "fnguyen@gmail.com",
+        "fullName": "nguyen van f",
+        "hashedPassword": "decde6db4c9be7b374b7e8c00c7dbdd3bd12d279748d7edcfb866628681e22cd",
+        "isTempPassword": true,
+        "pointBalance": 1000,
+        "role": 1,
+        "status": 2,
+        "transactionHistory": [
+            "{\"amount\":1000,\"incoming\":true,\"note\":\"Received at 2025-06-28 20:46:36\",\"otherWallet\":\"0xBA2646B251C8\"}"
+        ],
+        "username": "fnguyen",
+        "walletAddress": "0x7F8602352F7D"
     }
 ]

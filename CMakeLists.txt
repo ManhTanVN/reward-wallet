@@ -18,6 +18,7 @@ set(SOURCES
     src/sha256.cpp
     src/auth.cpp
     src/wallet.cpp
+    src/otp.cpp
 )
 
 set(HEADERS
@@ -28,6 +29,7 @@ set(HEADERS
     include/sha256.h
     include/auth.h
     include/wallet.h
+    include/otp.h
 )
 
 # Add executable

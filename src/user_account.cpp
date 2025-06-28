@@ -1,6 +1,7 @@
 #include "user_account.h"
 #include "data_manager.h"
 #include "sha256.h"
+#include "otp.h"
 #include <regex>
 #include <cstdlib>
 #include <ctime>
@@ -11,14 +12,13 @@
 // Constructor
 UserAccount::UserAccount(const std::string &fullName,
                          const std::string &email,
-                         const std::string &idNumber,
                          const std::string &username,
                          const std::string &password)
-    : fullName_(fullName), email_(email), idNumber_(idNumber),
+    : fullName_(fullName), email_(email),
       username_(username), status_(AccountStatus::PENDING),
       role_(UserRole::USER), isTempPassword_(false),
       creationDate_(std::chrono::system_clock::now()),
-      walletAddress_(generateWalletAddress()), pointBalance_(1000)
+      walletAddress_(generateWalletAddress()), pointBalance_(0)
 {
     if (!password.empty()) setPassword(password);
 }
@@ -26,7 +26,6 @@ UserAccount::UserAccount(const std::string &fullName,
 // Getters
 std::string UserAccount::getFullName() const { return fullName_; }
 std::string UserAccount::getEmail() const { return email_; }
-std::string UserAccount::getIdNumber() const { return idNumber_; }
 std::string UserAccount::getUsername() const { return username_; }
 std::string UserAccount::getHashedPassword() const { return hashedPassword_; }
 AccountStatus UserAccount::getStatus() const { return status_; }
@@ -36,6 +35,17 @@ std::chrono::system_clock::time_point UserAccount::getCreationDate() const { ret
 std::string UserAccount::getWalletAddress() const { return walletAddress_; }
 int UserAccount::getPointBalance() const { return pointBalance_; }
 const std::vector<std::string>& UserAccount::getTransactionHistory() const { return transactionHistory_; }
+
+// OTP
+void UserAccount::setOTP(const std::string& otp, int ttlSeconds) {
+    currentOTP_ = otp;
+    otpExpiry_ = std::chrono::system_clock::now() + std::chrono::seconds(ttlSeconds);
+}
+
+bool UserAccount::verifyOTP(const std::string& input) const {
+    return OTPManager::isOTPValid(currentOTP_, input, otpExpiry_);
+}
+
 
 // Setters
 void UserAccount::setFullName(const std::string &fullName) { fullName_ = fullName; }
