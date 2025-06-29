@@ -83,7 +83,7 @@ bool transferPoints(DataManager &manager,
         {"note", note},
         {"type", receiveTxType}};
 
-    // Lưu log giao dịch vào lịch sử của từng người
+    // Lưu log giao  dịch vào lịch sử của từng người
     from->addTransaction(sendLog.dump());
     to->addTransaction(receiveLog.dump());
 

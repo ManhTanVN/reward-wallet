@@ -22,7 +22,7 @@ public:
     static std::string generateOTP();
 
     /**
-     * @brief Kiểm tra tính hợp lệ của mã OTP.
+     * @brief Kiểm tra tính hợp  lệ của mã OTP.
      *
      * So sánh mã OTP hệ thống sinh ra với đầu vào người dùng, đồng thời kiểm tra xem mã còn trong thời gian hiệu lực không.
      *

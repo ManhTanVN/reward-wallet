@@ -15,7 +15,7 @@ std::shared_ptr<UserAccount> authenticateUser(
     // Tìm user từ file dữ liệu
     auto user = manager.findUser(username);
 
-    // Nếu không tìm thấy user hoặc mật khẩu không đúng thì trả về nullptr
+    // Nếu không tìm  thấy user hoặc mật khẩu không đúng thì trả về nullptr
     if (!user || !user->validatePassword(password))
         return nullptr;
 

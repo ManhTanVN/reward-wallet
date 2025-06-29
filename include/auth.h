@@ -6,7 +6,7 @@
 #include <memory>         // Sử dụng std::shared_ptr
 
 // Hàm xác thực người dùng bao gồm kiểm tra mật khẩu và mã OTP.
-// Trả về con trỏ UserAccount nếu xác thực thành công, ngược lại trả về nullptr.
+// Trả về con trỏ UserAccount nếu xác thực thành công, ngược lại trả về  nullptr.
 // Tham số isBackup cho biết có ghi bản sao lưu sau khi sinh OTP hay không (mặc định có).
 std::shared_ptr<UserAccount> authenticateUser(
     DataManager &manager,        // Quản lý và truy xuất người dùng từ file

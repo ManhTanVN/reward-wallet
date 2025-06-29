@@ -147,7 +147,7 @@ void listBackupFiles(const std::string &backupDir)
             std::cout << "  [" << i << "] " << fs::path(backups[i]).filename().string() << "\n";
         }
 
-        // Nhập chỉ số backup để chọn
+        // Nhập chỉ số  backup để chọn
         int index = getValidatedInput("Choose backup index to restore: ", 0, backups.size() - 1);
 
         // Thực hiện khôi phục file được chọn

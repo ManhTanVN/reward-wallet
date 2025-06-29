@@ -2,7 +2,7 @@
 
 #include "data_manager.h" // Quản lý lưu trữ và truy xuất thông tin người dùng
 #include "user_account.h" // Định nghĩa lớp UserAccount, chứa thông tin và chức năng xác thực
-#include <memory>         // Sử dụng std::shared_ptr để quản lý bộ nhớ người dùng
+#include <memory>         // Sử dụng std::shared_ptr để  quản lý bộ nhớ người dùng
 
 // Giao diện chính cho người dùng chưa đăng nhập
 void showMainMenu();                        // Hiển thị menu chính

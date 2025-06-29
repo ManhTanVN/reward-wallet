@@ -8,7 +8,7 @@
 // - fromWallet: địa chỉ ví của người gửi
 // - toWallet: địa chỉ ví của người nhận
 // - amount: số lượng điểm muốn chuyển
-// - note: ghi chú cho giao dịch (mặc định rỗng nếu không cung cấp)
+// - note: ghi chú cho giao dịch  (mặc định rỗng nếu không cung cấp)
 //
 // Trả về true nếu chuyển thành công, false nếu có lỗi (ví dụ: không đủ điểm, OTP sai,...)
 bool transferPoints(DataManager &manager,

@@ -24,7 +24,7 @@ enum class UserRole
 class UserAccount
 {
 public:
-    // Constructor: khởi tạo tài khoản mới với thông tin đầu vào
+    // Constructor: khởi tạo  tài khoản mới với thông tin đầu vào
     UserAccount(const std::string &fullName,
                 const std::string &email,
                 const std::string &username,

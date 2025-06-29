@@ -232,4 +232,4 @@ std::shared_ptr<UserAccount> DataManager::jsonToUser(const json &j) const
 
     return user;
 }
-// ---------------------- Backup Management -----------------------
+// ---------------------- Backup  Management -----------------------

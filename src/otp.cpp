@@ -19,7 +19,7 @@ std::string OTPManager::generateOTP()
 }
 
 /**
- * @brief Kiểm tra tính hợp lệ của OTP.
+ * Kiểm tra tính hợp lệ của OTP.
  *
  * So sánh mã OTP được sinh ra với đầu vào của người dùng, đồng thời kiểm tra hạn sử dụng (expiry).
  *

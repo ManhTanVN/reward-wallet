@@ -106,7 +106,7 @@ bool UserAccount::isPasswordValid(const std::string &password)
         else if (std::isdigit(c))
             hasDigit = true;
         else
-            hasSpecial = true; // Bao gồm ký tự đặc biệt
+            hasSpecial = true; // Bao gồm  ký tự đặc biệt
     }
     return hasUpper && hasLower && hasDigit && hasSpecial;
 }

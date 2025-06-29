@@ -130,7 +130,7 @@ private:
     // ================== Chuyển đổi JSON <-> UserAccount ==================
 
     /**
-     * @brief Chuyển UserAccount sang JSON để lưu vào file.
+     * @brief Chuyển UserAccount sang J SON để lưu vào file.
      * @param user Con trỏ tới đối tượng UserAccount.
      * @return Đối tượng JSON biểu diễn người dùng.
      */
