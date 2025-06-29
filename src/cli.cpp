@@ -3,19 +3,11 @@
 #include "auth.h"
 #include "wallet.h"
 #include "otp.h"
+#include "utils.h"
 #include <iostream>
 #include <limits>
 
 using json = nlohmann::json;
-
-// Đặt ở đây để các hàm bên dưới như buyPoints có thể sử dụng
-std::string currentTimestamp() {
-    auto now = std::chrono::system_clock::now();
-    std::time_t timeT = std::chrono::system_clock::to_time_t(now);
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&timeT), "%Y-%m-%d %H:%M:%S");
-    return ss.str();
-}
 
 int countUsersReceivedFromMaster(DataManager &manager) {
     auto users = manager.loadAllUsers();
@@ -44,9 +36,9 @@ void handleUserInput(DataManager &manager) {
     int choice;
     do {
         showMainMenu();
-        std::cin >> choice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
+        // std::cin >> choice;
+        // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        choice = getValidatedInput("Enter your choice: ", 0, 2);
         switch (choice) {
             case 1:
                 registerUser(manager);
@@ -91,7 +83,7 @@ void registerUser(DataManager &manager) {
 
     auto master = manager.findUser("__master__wallet__");
     if (master && countUsersReceivedFromMaster(manager) < 10 && master->getPointBalance() >= 1000) {
-        if (transferPoints(manager, master->getWalletAddress(), user->getWalletAddress(), 1000)) {
+        if (transferPoints(manager, master->getWalletAddress(), user->getWalletAddress(), 1000, "reward")) {
             std::cout << "User received 1000 points from master wallet\n";
         }
     }
@@ -105,7 +97,7 @@ std::shared_ptr<UserAccount> loginUser(DataManager &manager) {
     std::cout << "Password: ";
     std::getline(std::cin, password);
 
-    auto user = authenticateUser(manager, username, password);
+    auto user = authenticateUser(manager, username, password, false);
     if (!user) {
         std::cout << "Login failed.\n";
         return nullptr;
@@ -133,7 +125,7 @@ void buyPoints(std::shared_ptr<UserAccount> buyer, DataManager& manager) {
         return;
     }
 
-    // Xác minh mật khẩu lại
+    // Xác minh lại mật khẩu
     std::string password;
     std::cout << "Re-enter your password: ";
     std::getline(std::cin, password);
@@ -142,10 +134,10 @@ void buyPoints(std::shared_ptr<UserAccount> buyer, DataManager& manager) {
         return;
     }
 
-    // Gửi OTP
+    // Xác thực OTP
     std::string otp = OTPManager::generateOTP();
     buyer->setOTP(otp);
-    manager.saveUser(buyer);
+    manager.saveUser(buyer); // Lưu OTP vào hệ thống
     std::cout << "Your OTP: " << otp << "\n";
 
     std::string input;
@@ -156,62 +148,45 @@ void buyPoints(std::shared_ptr<UserAccount> buyer, DataManager& manager) {
         return;
     }
 
-    // Tìm master
+    // Tìm ví master
     auto master = manager.findUser("__master__wallet__");
     if (!master) {
         std::cout << "[ERROR] Master wallet not found.\n";
         return;
     }
 
-    // Giả lập thanh toán thành công
-    std::cout << "Simulating payment... done.\n";
-
-    // Mint point cho master rồi chuyển
+    // 1. Tăng điểm (mint) cho ví master
     master->setPointBalance(master->getPointBalance() + amount);
 
-    // 1. Ghi log mint vào master
-    std::string mintLog = json{
+    // Ghi log mint
+    json mintLog = {
         {"amount", amount},
         {"incoming", true},
-        {"type", "mint"},
-        {"timestamp", currentTimestamp()},
         {"otherWallet", "SYSTEM"},
-        {"note", "Mint points for user purchase"}
-    }.dump();
-    master->addTransaction(mintLog);
-
-    // 2. Ghi log gửi cho user vào master
-    std::string sendToUserLog = json{
-        {"amount", amount},
-        {"incoming", false},
-        {"type", "buy"},
         {"timestamp", currentTimestamp()},
-        {"otherWallet", buyer->getWalletAddress()},
-        {"note", "Send bought points to user"}
-    }.dump();
-    master->addTransaction(sendToUserLog);
+        {"note", "Minted for sale"},
+        {"type", "mint"}
+    };
+    master->addTransaction(mintLog.dump());
+    manager.saveUser(master);  // Lưu lại điểm và log mint
 
-    // 3. Ghi log nhận vào user
-    std::string receiveFromMasterLog = json{
-        {"amount", amount},
-        {"incoming", true},
-        {"type", "buy"},
-        {"timestamp", currentTimestamp()},
-        {"otherWallet", master->getWalletAddress()},
-        {"note", "Buy points"}
-    }.dump();
+    // 2. Chuyển điểm từ master sang buyer
+    bool success = transferPoints(manager,
+                                master->getWalletAddress(),
+                                buyer->getWalletAddress(),
+                                amount,
+                                "Buy points");
 
-    buyer->addTransaction(receiveFromMasterLog);
+    if (success) {
+        std::cout << "Purchased " << amount << " points successfully.\n";
 
-    // Cập nhật số dư user
-    buyer->setPointBalance(buyer->getPointBalance() + amount);
-
-    // Lưu cả hai lại
-    manager.saveUser(master);
-    manager.saveUser(buyer);
-
-    std::cout << "Purchased " << amount << " points successfully.\n";
+        // Reload lại buyer để cập nhật số dư mới nhất
+        buyer = manager.findUser(buyer->getUsername());
+    } else {
+        std::cout << "Transfer failed after minting. Check balances.\n";
+    }
 }
+
 
 
 
@@ -231,12 +206,18 @@ void showUserMenu(const std::shared_ptr<UserAccount> &user, DataManager &manager
         std::cout << "6. Send points\n";
         std::cout << "7. View transaction history\n";
         std::cout << "8. Buy points\n";
+        if (user->getRole() == UserRole::ADMIN) {
+            std::cout << "9. Backup data\n";
+            std::cout << "10. Restore from backup\n";
+        }
         std::cout << "0. Logout\n";
         std::cout << "============================\n";
         std::cout << "Choice: ";
 
-        std::cin >> choice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        // std::cin >> choice;
+        // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        choice = getValidatedInput("Enter your choice: ", 0, 10);
 
         switch (choice) {
             case 1:
@@ -255,16 +236,24 @@ void showUserMenu(const std::shared_ptr<UserAccount> &user, DataManager &manager
                 changePassword(user, manager);
                 break;
             case 5:
-                showBalance(user);
+                showBalance(user, manager);
                 break;
             case 6:
                 transferPointsCLI(user, manager);
                 break;
             case 7:
-                viewTransactionHistory(user);
+                viewTransactionHistory(user, manager);
                 break;
             case 8:
                 buyPoints(user, manager);
+                break;
+            case 9:
+                if (user->getRole() == UserRole::ADMIN) createBackup("data/users.json", "backups");
+                else std::cout << "Permission denied.\n";
+                break;
+            case 10:
+                if (user->getRole() == UserRole::ADMIN) listBackupFiles("backups");
+                else std::cout << "Permission denied.\n";
                 break;
             case 0:
                 std::cout << "Logging out...\n";
@@ -323,7 +312,7 @@ void createMultipleUsers(DataManager &manager) {
         manager.saveUser(user);
 
         if (alreadyRewarded < 10 && master->getPointBalance() >= 1000) {
-            if (transferPoints(manager, master->getWalletAddress(), user->getWalletAddress(), 1000)) {
+            if (transferPoints(manager, master->getWalletAddress(), user->getWalletAddress(), 1000, "reward")) {
                 ++alreadyRewarded;
                 std::cout << "[+] Gave 1000 pts to " << username << " from master wallet.\n";
             }
@@ -362,9 +351,16 @@ void changePassword(std::shared_ptr<UserAccount> user, DataManager &manager) {
     std::cout << "Password changed.\n";
 }
 
-void showBalance(const std::shared_ptr<UserAccount> &user) {
-    std::cout << "Wallet address: " << user->getWalletAddress() << "\n";
-    std::cout << "Balance: " << user->getPointBalance() << " points\n";
+
+void showBalance(const std::shared_ptr<UserAccount>& user, DataManager& manager) {
+    auto refreshedUser = manager.findUser(user->getUsername());
+    if (!refreshedUser) {
+        std::cout << "[ERROR] Cannot find user.\n";
+        return;
+    }
+
+    std::cout << "Wallet address: " << refreshedUser->getWalletAddress() << "\n";
+    std::cout << "Balance: " << refreshedUser->getPointBalance() << " points\n";
 }
 
 void transferPointsCLI(std::shared_ptr<UserAccount> sender, DataManager &manager) {
@@ -397,14 +393,20 @@ void transferPointsCLI(std::shared_ptr<UserAccount> sender, DataManager &manager
     }
 }
 
-void viewTransactionHistory(const std::shared_ptr<UserAccount> &user) {
-    const auto &logs = user->getTransactionHistory();
+void viewTransactionHistory(const std::shared_ptr<UserAccount>& user, DataManager& manager) {
+    auto refreshedUser = manager.findUser(user->getUsername());
+    if (!refreshedUser) {
+        std::cout << "[ERROR] Cannot load user from file.\n";
+        return;
+    }
+
+    const auto& logs = refreshedUser->getTransactionHistory();
     if (logs.empty()) {
         std::cout << "No transactions.\n";
         return;
     }
 
-    for (const auto &logStr : logs) {
+    for (const auto& logStr : logs) {
         try {
             json log = json::parse(logStr);
             std::string type = log.value("type", "transfer");
@@ -414,21 +416,22 @@ void viewTransactionHistory(const std::shared_ptr<UserAccount> &user) {
             std::string note = log.value("note", "");
             std::string timestamp = log.value("timestamp", "");
 
-            if (type == "buy") {
+            if (type == "buy" && incoming) {
                 std::cout << "[BUY] +" << amount << " points from Master";
-                if (!timestamp.empty()) std::cout << " | Time: " << timestamp;
-                if (!note.empty()) std::cout << " | Note: " << note;
-                std::cout << "\n";
+            } else if (incoming) {
+                std::cout << "[RECEIVED] from " << otherWallet << " - +" << amount << " points";
             } else {
-                std::cout << (incoming ? "[RECEIVED] from " : "[SENT] to ")
-                          << otherWallet << " - " << amount << " points";
-                if (!note.empty()) std::cout << " | Note: " << note;
-                if (!timestamp.empty()) std::cout << " | Time: " << timestamp;
-                std::cout << "\n";
+                std::cout << "[SENT] to " << otherWallet << " - -" << amount << " points";
             }
-        } catch (const std::exception &e) {
+
+            if (!note.empty()) std::cout << " | Note: " << note;
+            if (!timestamp.empty()) std::cout << " | Time: " << timestamp;
+            std::cout << "\n";
+
+        } catch (const std::exception& e) {
             std::cout << "[Invalid log format] " << e.what() << "\n";
         }
     }
 }
+
 

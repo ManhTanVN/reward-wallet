@@ -1,39 +1,34 @@
 #include "wallet.h"
 #include "otp.h"
+#include "utils.h"
 #include <iostream>
-#include <ctime>
-#include <sstream>
-#include <iomanip>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
-std::string currentTime() {
-    std::time_t now = std::time(nullptr);
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&now), "%F %T");
-    return ss.str();
-}
-
 bool transferPoints(DataManager& manager,
                     const std::string& fromWallet,
                     const std::string& toWallet,
-                    int amount)
+                    int amount,
+                    const std::string& note)
 {
     if (fromWallet == toWallet || amount <= 0) return false;
 
-    auto users = manager.loadAllUsers();
-    std::shared_ptr<UserAccount> from = nullptr, to = nullptr;
+    // Tìm người gửi và người nhận
+    auto from = manager.findUserByWallet(fromWallet);
+    auto to = manager.findUserByWallet(toWallet);
 
-    for (auto& u : users) {
-        if (u->getWalletAddress() == fromWallet) from = u;
-        if (u->getWalletAddress() == toWallet) to = u;
+    if (!from || !to) {
+        std::cout << "[ERROR] Sender or receiver not found.\n";
+        return false;
     }
 
-    if (!from || !to) return false;
-    if (from->getPointBalance() < amount) return false;
+    if (from->getPointBalance() < amount) {
+        std::cout << "[ERROR] Not enough balance.\n";
+        return false;
+    }
 
-    // ✅ Bỏ qua OTP nếu là ví master
+    // ✅ OTP xác thực nếu không phải ví master
     if (from->getUsername() != "__master__wallet__") {
         std::string otp = OTPManager::generateOTP();
         from->setOTP(otp);
@@ -49,29 +44,40 @@ bool transferPoints(DataManager& manager,
         }
     }
 
+    // Trừ và cộng điểm
     from->setPointBalance(from->getPointBalance() - amount);
     to->setPointBalance(to->getPointBalance() + amount);
 
-    std::string time = currentTime();
+    std::string timestamp = currentTimestamp();
+    std::string sendTxType = "transfer";
+    std::string receiveTxType = (note == "Buy points") ? "buy" : "transfer";
 
-    // Ghi log dưới dạng JSON
     json sendLog = {
+        {"amount", amount},
         {"incoming", false},
-        {"otherWallet", toWallet},
-        {"amount", amount},
-        {"note", "Sent at " + time}
+        {"otherWallet", to->getWalletAddress()},
+        {"timestamp", timestamp},
+        {"note", note},
+        {"type", sendTxType}
     };
+
     json receiveLog = {
-        {"incoming", true},
-        {"otherWallet", fromWallet},
         {"amount", amount},
-        {"note", "Received at " + time}
+        {"incoming", true},
+        {"otherWallet", from->getWalletAddress()},
+        {"timestamp", timestamp},
+        {"note", note},
+        {"type", receiveTxType}
     };
 
     from->addTransaction(sendLog.dump());
     to->addTransaction(receiveLog.dump());
 
+    // Lưu cả 2 người dùng
     manager.saveUser(from);
     manager.saveUser(to);
+
+    std::cout << "Transferred " << amount << " points from " << from->getUsername()
+              << " to " << to->getUsername() << ".\n";
     return true;
 }

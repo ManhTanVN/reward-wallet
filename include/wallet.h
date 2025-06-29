@@ -5,4 +5,5 @@
 bool transferPoints(DataManager& manager,
                     const std::string& fromWallet,
                     const std::string& toWallet,
-                    int amount);
+                    int amount,
+                    const std::string& note = "");

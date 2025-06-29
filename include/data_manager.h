@@ -23,11 +23,14 @@ public:
     DataManager(const std::string &dataPath = "data/users.json");
 
     // User account operations
-    void saveUser(const std::shared_ptr<UserAccount> &user);
+    void saveUser(const std::shared_ptr<UserAccount>& user, bool makeBackup = true);
+
     void saveAllUsers(const std::vector<std::shared_ptr<UserAccount>> &users);
     std::vector<std::shared_ptr<UserAccount>> loadAllUsers(); // load from file
     void removeUser(const std::string &username);
     std::shared_ptr<UserAccount> findUser(const std::string &username);
+    std::shared_ptr<UserAccount> findUserByWallet(const std::string& walletAddr);
+
 
     // Password hashing
     static std::string hashPassword(const std::string &password);

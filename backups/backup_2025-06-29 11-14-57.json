@@ -5,12 +5,11 @@
         "fullName": "nguyen van a",
         "hashedPassword": "c387b222a52a3f4cfc689dd4b1200e6d0dc78363e3c387f81d2496a69ec6be60",
         "isTempPassword": false,
-        "pointBalance": 500,
+        "pointBalance": 1000,
         "role": 1,
         "status": 2,
         "transactionHistory": [
-            "{\"amount\":1000,\"incoming\":true,\"note\":\"reward\",\"otherWallet\":\"0x774D982C2C9D\",\"timestamp\":\"2025-06-29 11:14:46\",\"type\":\"transfer\"}",
-            "{\"amount\":500,\"incoming\":false,\"note\":\"\",\"otherWallet\":\"0xE6CA45458D4B\",\"timestamp\":\"2025-06-29 11:16:21\",\"type\":\"transfer\"}"
+            "{\"amount\":1000,\"incoming\":true,\"note\":\"reward\",\"otherWallet\":\"0x774D982C2C9D\",\"timestamp\":\"2025-06-29 11:14:46\",\"type\":\"transfer\"}"
         ],
         "username": "anguyen",
         "walletAddress": "0xD23A5CFE5C78"
@@ -35,13 +34,11 @@
         "email": "admin@example.com",
         "fullName": "Administrator",
         "hashedPassword": "e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7",
-        "isTempPassword": false,
-        "pointBalance": 500,
+        "isTempPassword": true,
+        "pointBalance": 0,
         "role": 0,
         "status": 0,
-        "transactionHistory": [
-            "{\"amount\":500,\"incoming\":true,\"note\":\"\",\"otherWallet\":\"0xD23A5CFE5C78\",\"timestamp\":\"2025-06-29 11:16:21\",\"type\":\"transfer\"}"
-        ],
+        "transactionHistory": [],
         "username": "admin",
         "walletAddress": "0xE6CA45458D4B"
     }

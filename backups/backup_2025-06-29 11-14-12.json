@@ -1,0 +1,28 @@
+[
+    {
+        "creationDate": 1751170452,
+        "email": "system@wallet.com",
+        "fullName": "System Wallet",
+        "hashedPassword": "8e44c1a2c4a3b785e2b601f228966e5cd2d9f5e67e6e96ad98c5ad3127098648",
+        "isTempPassword": false,
+        "pointBalance": 10000,
+        "role": 0,
+        "status": 0,
+        "transactionHistory": [],
+        "username": "__master__wallet__",
+        "walletAddress": "0x774D982C2C9D"
+    },
+    {
+        "creationDate": 1751170452,
+        "email": "admin@example.com",
+        "fullName": "Administrator",
+        "hashedPassword": "e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7",
+        "isTempPassword": true,
+        "pointBalance": 0,
+        "role": 0,
+        "status": 0,
+        "transactionHistory": [],
+        "username": "admin",
+        "walletAddress": "0xE6CA45458D4B"
+    }
+]

@@ -28,14 +28,14 @@
 
 //     return user;
 // }
-std::shared_ptr<UserAccount> authenticateUser(DataManager& manager, const std::string& username, const std::string& password) {
+std::shared_ptr<UserAccount> authenticateUser(DataManager& manager, const std::string& username, const std::string& password, bool isBackup) {
     auto user = manager.findUser(username);
     if (!user || !user->validatePassword(password))
         return nullptr;
 
     std::string otp = OTPManager::generateOTP();
     user->setOTP(otp);
-    manager.saveUser(user);
+    manager.saveUser(user, isBackup);
 
     std::cout << "Your OTP: " << otp << "\n"; // sản phẩm thật thì gửi email
 

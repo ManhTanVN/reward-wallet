@@ -1,4 +1,5 @@
 #include "data_manager.h"
+#include "utils.h"
 #include "sha256.h"
 #include <fstream>
 #include <sstream>
@@ -65,7 +66,7 @@ void DataManager::clearCache() {
 
 // ---------------------- User Operations -----------------------
 
-void DataManager::saveUser(const std::shared_ptr<UserAccount> &user) {
+void DataManager::saveUser(const std::shared_ptr<UserAccount>& user, bool makeBackup) {
     loadCache();
     userMap_[user->getUsername()] = user;
 
@@ -73,7 +74,12 @@ void DataManager::saveUser(const std::shared_ptr<UserAccount> &user) {
     for (const auto &[username, u] : userMap_) {
         users.push_back(u);
     }
+
     saveAllUsers(users);
+
+    if (makeBackup) {
+        createBackup("data/users.json", "backups");
+    }
 }
 
 void DataManager::removeUser(const std::string &username) {
@@ -84,7 +90,11 @@ void DataManager::removeUser(const std::string &username) {
     for (const auto &[username, u] : userMap_) {
         users.push_back(u);
     }
+
     saveAllUsers(users);
+
+    // Tạo bản sao lưu sau khi xóa người dùng
+    createBackup("data/users.json", "backups");
 }
 
 std::shared_ptr<UserAccount> DataManager::findUser(const std::string &username) {
@@ -94,6 +104,17 @@ std::shared_ptr<UserAccount> DataManager::findUser(const std::string &username) 
         return it->second;
     return nullptr;
 }
+
+std::shared_ptr<UserAccount> DataManager::findUserByWallet(const std::string& walletAddr) {
+    auto users = loadAllUsers();
+    for (const auto& user : users) {
+        if (user->getWalletAddress() == walletAddr) {
+            return user;
+        }
+    }
+    return nullptr; // Not found
+}
+
 
 std::vector<std::shared_ptr<UserAccount>> DataManager::loadAllUsers() {
     json jArr = readJsonFromFile();
