@@ -5,12 +5,11 @@
         "fullName": "Administrator",
         "hashedPassword": "e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7",
         "isTempPassword": false,
-        "pointBalance": 1500,
+        "pointBalance": 500,
         "role": 0,
         "status": 0,
         "transactionHistory": [
-            "{\"amount\":500,\"incoming\":true,\"note\":\"\",\"otherWallet\":\"0xD23A5CFE5C78\",\"timestamp\":\"2025-06-29 11:16:21\",\"type\":\"transfer\"}",
-            "{\"amount\":1000,\"incoming\":true,\"note\":\"Buy points\",\"otherWallet\":\"0x774D982C2C9D\",\"timestamp\":\"2025-06-29 11:54:15\",\"type\":\"buy\"}"
+            "{\"amount\":500,\"incoming\":true,\"note\":\"\",\"otherWallet\":\"0xD23A5CFE5C78\",\"timestamp\":\"2025-06-29 11:16:21\",\"type\":\"transfer\"}"
         ],
         "username": "admin",
         "walletAddress": "0xE6CA45458D4B"
@@ -25,9 +24,7 @@
         "role": 0,
         "status": 0,
         "transactionHistory": [
-            "{\"amount\":1000,\"incoming\":false,\"note\":\"reward\",\"otherWallet\":\"0xD23A5CFE5C78\",\"timestamp\":\"2025-06-29 11:14:46\",\"type\":\"transfer\"}",
-            "{\"amount\":1000,\"incoming\":true,\"note\":\"Minted for sale\",\"otherWallet\":\"SYSTEM\",\"timestamp\":\"2025-06-29 11:54:15\",\"type\":\"mint\"}",
-            "{\"amount\":1000,\"incoming\":false,\"note\":\"Buy points\",\"otherWallet\":\"0xE6CA45458D4B\",\"timestamp\":\"2025-06-29 11:54:15\",\"type\":\"transfer\"}"
+            "{\"amount\":1000,\"incoming\":false,\"note\":\"reward\",\"otherWallet\":\"0xD23A5CFE5C78\",\"timestamp\":\"2025-06-29 11:14:46\",\"type\":\"transfer\"}"
         ],
         "username": "__master__wallet__",
         "walletAddress": "0x774D982C2C9D"
