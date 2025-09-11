@@ -4,6 +4,13 @@
 #include <vector>
 #include <chrono>
 
+// Liệt kê các vai trò người dùng
+enum class UserRole
+{
+    ADMIN, // Quản trị viên
+    USER   // Người dùng thông thường
+};
+
 // Liệt kê các trạng thái tài khoản
 enum class AccountStatus
 {
@@ -11,13 +18,6 @@ enum class AccountStatus
     SUSPENDED, // Bị tạm khóa
     PENDING,   // Chờ xác thực
     INACTIVE   // Không hoạt động
-};
-
-// Liệt kê các vai trò người dùng
-enum class UserRole
-{
-    ADMIN, // Quản trị viên
-    USER   // Người dùng thông thường
 };
 
 // Lớp đại diện cho tài khoản người dùng
@@ -64,8 +64,8 @@ public:
     void addTransaction(const std::string &log);
 
     // Các hàm xử lý mật khẩu
-    bool validatePassword(const std::string &password) const; // Kiểm tra mật khẩu đầu vào với mật khẩu đã mã hóa
     static bool isPasswordValid(const std::string &password); // Kiểm tra độ mạnh của mật khẩu
+    bool validatePassword(const std::string &password) const; // Kiểm tra mật khẩu đầu vào với mật khẩu đã mã hóa
     static std::string generateTempPassword();                // Sinh mật khẩu tạm thời ngẫu nhiên
 
 private:
