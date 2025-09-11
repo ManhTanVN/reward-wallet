@@ -93,10 +93,23 @@ std::string UserAccount::generateWalletAddress()
 }
 
 // ==================== Password ====================
-// Xác thực mật khẩu (so sánh với hash đã lưu)
-bool UserAccount::validatePassword(const std::string &password) const
+// Sinh mật khẩu tạm thời ngẫu nhiên (12 ký tự)
+std::string UserAccount::generateTempPassword()
 {
-    return DataManager::verifyPassword(password, hashedPassword_);
+    const std::string charset =
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*"; // Bộ ký tự cho random
+    const int len = 12;
+    std::string temp;
+    std::srand(static_cast<unsigned>(std::time(nullptr))); // Seed ngẫu nhiên
+    for (int i = 0; i < len; ++i)
+        temp += charset[std::rand() % charset.length()]; // Random ký tự bất kỳ
+
+    // Ép buộc đảm bảo mật khẩu có đủ loại ký tự (hoa, thường, số, đặc biệt)
+    temp[0] = 'A';
+    temp[1] = 'a';
+    temp[2] = '9';
+    temp[3] = '#';
+    return temp;
 }
 
 // Kiểm tra độ mạnh mật khẩu
@@ -120,21 +133,10 @@ bool UserAccount::isPasswordValid(const std::string &password)
     return hasUpper && hasLower && hasDigit && hasSpecial;
 }
 
-// Sinh mật khẩu tạm thời ngẫu nhiên (12 ký tự)
-std::string UserAccount::generateTempPassword()
+// Xác thực mật khẩu (so sánh với hash đã lưu)
+bool UserAccount::validatePassword(const std::string &password) const
 {
-    const std::string charset =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*"; // Bộ ký tự cho random
-    const int len = 12;
-    std::string temp;
-    std::srand(static_cast<unsigned>(std::time(nullptr))); // Seed ngẫu nhiên
-    for (int i = 0; i < len; ++i)
-        temp += charset[std::rand() % charset.length()]; // Random ký tự bất kỳ
-
-    // Ép buộc đảm bảo mật khẩu có đủ loại ký tự (hoa, thường, số, đặc biệt)
-    temp[0] = 'A';
-    temp[1] = 'a';
-    temp[2] = '9';
-    temp[3] = '#';
-    return temp;
+    return DataManager::verifyPassword(password, hashedPassword_);
 }
+
+
