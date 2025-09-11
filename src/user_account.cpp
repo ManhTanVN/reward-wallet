@@ -26,7 +26,8 @@ UserAccount::UserAccount(const std::string &fullName,
         setPassword(password); // Nếu có mật khẩu truyền vào thì mã hóa và lưu
 }
 
-// Các hàm getter – trả về thông tin tài khoản
+// ==================== Getter ====================
+// Các hàm lấy thông tin của tài khoản
 std::string UserAccount::getFullName() const { return fullName_; }
 std::string UserAccount::getEmail() const { return email_; }
 std::string UserAccount::getUsername() const { return username_; }
@@ -39,26 +40,29 @@ std::string UserAccount::getWalletAddress() const { return walletAddress_; }
 int UserAccount::getPointBalance() const { return pointBalance_; }
 const std::vector<std::string> &UserAccount::getTransactionHistory() const { return transactionHistory_; }
 
-// Cài đặt và xác thực OTP
+// ==================== OTP ====================
+// Cài đặt OTP cho user với thời hạn (ttlSeconds)
 void UserAccount::setOTP(const std::string &otp, int ttlSeconds)
 {
     currentOTP_ = otp;
     otpExpiry_ = std::chrono::system_clock::now() + std::chrono::seconds(ttlSeconds); // Thiết lập thời điểm hết hạn
 }
 
+// Xác thực OTP được nhập
 bool UserAccount::verifyOTP(const std::string &input) const
 {
-    return OTPManager::isOTPValid(currentOTP_, input, otpExpiry_); // Xác thực OTP thông qua OTPManager
+    return OTPManager::isOTPValid(currentOTP_, input, otpExpiry_); // OTPManager xử lý so sánh & kiểm tra hạn
 }
 
-// Các hàm setter – cập nhật thông tin tài khoản
+// ==================== Setter ====================
+// Các hàm cập nhật thông tin user
 void UserAccount::setFullName(const std::string &fullName) { fullName_ = fullName; }
 void UserAccount::setEmail(const std::string &email) { email_ = email; }
 
 void UserAccount::setPassword(const std::string &password)
 {
-    hashedPassword_ = DataManager::hashPassword(password); // Mã hóa mật khẩu bằng hàm hash trong DataManager
-    isTempPassword_ = false;                               // Đánh dấu là mật khẩu thực, không phải mật khẩu tạm
+    hashedPassword_ = DataManager::hashPassword(password); // Mã hóa mật khẩu trước khi lưu
+    isTempPassword_ = false;                               // Sau khi set, mật khẩu này là thật
 }
 
 void UserAccount::setHashedPassword(const std::string &hashedPassword) { hashedPassword_ = hashedPassword; }
@@ -69,33 +73,38 @@ void UserAccount::setCreationDate(const std::chrono::system_clock::time_point &d
 void UserAccount::setPointBalance(int points) { pointBalance_ = points; }
 void UserAccount::setWalletAddress(const std::string &address) { walletAddress_ = address; }
 void UserAccount::setTransactionHistory(const std::vector<std::string> &history) { transactionHistory_ = history; }
-void UserAccount::addTransaction(const std::string &log) { transactionHistory_.push_back(log); } // Thêm log giao dịch vào lịch sử
 
-// Hàm sinh địa chỉ ví ngẫu nhiên (dạng hex) có tiền tố "0x"
+// Thêm log giao dịch vào lịch sử
+void UserAccount::addTransaction(const std::string &log) { transactionHistory_.push_back(log); }
+
+// ==================== Wallet ====================
+// Hàm sinh địa chỉ ví ngẫu nhiên (12 ký tự hex) dạng "0xABC123..."
 std::string UserAccount::generateWalletAddress()
 {
     static const char hexChars[] = "0123456789ABCDEF"; // Các ký tự hex
     std::stringstream ss;
-    ss << "0x"; // Bắt đầu địa chỉ với "0x"
+    ss << "0x"; // Prefix bắt buộc của địa chỉ ví
     std::random_device rd;
-    std::mt19937 gen(rd());                      // Bộ sinh số ngẫu nhiên
-    std::uniform_int_distribution<> dist(0, 15); // Chọn số từ 0 đến 15
+    std::mt19937 gen(rd());                      // Bộ sinh số ngẫu nhiên Mersenne Twister
+    std::uniform_int_distribution<> dist(0, 15); // Sinh số trong khoảng 0-15 (hex)
     for (int i = 0; i < 12; ++i)
-        ss << hexChars[dist(gen)]; // Ghép từng ký tự hex ngẫu nhiên
+        ss << hexChars[dist(gen)]; // Ghép ký tự hex ngẫu nhiên
     return ss.str();
 }
 
-// Xác thực mật khẩu người dùng với mật khẩu đã mã hóa
+// ==================== Password ====================
+// Xác thực mật khẩu (so sánh với hash đã lưu)
 bool UserAccount::validatePassword(const std::string &password) const
 {
     return DataManager::verifyPassword(password, hashedPassword_);
 }
 
-// Kiểm tra độ mạnh của mật khẩu
+// Kiểm tra độ mạnh mật khẩu
 bool UserAccount::isPasswordValid(const std::string &password)
 {
     if (password.length() < 8)
-        return false; // Tối thiểu 8 ký tự
+        return false; // Độ dài tối thiểu 8 ký tự
+
     bool hasUpper = false, hasLower = false, hasDigit = false, hasSpecial = false;
     for (char c : password)
     {
@@ -106,22 +115,23 @@ bool UserAccount::isPasswordValid(const std::string &password)
         else if (std::isdigit(c))
             hasDigit = true;
         else
-            hasSpecial = true; // Bao gồm  ký tự đặc biệt
+            hasSpecial = true; // Nếu không thuộc các loại trên thì coi là ký tự đặc biệt
     }
     return hasUpper && hasLower && hasDigit && hasSpecial;
 }
 
-// Sinh mật khẩu tạm thời ngẫu nhiên (dài 12 ký tự)
+// Sinh mật khẩu tạm thời ngẫu nhiên (12 ký tự)
 std::string UserAccount::generateTempPassword()
 {
     const std::string charset =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*"; // Bộ ký tự dùng để sinh mật khẩu
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*"; // Bộ ký tự cho random
     const int len = 12;
     std::string temp;
-    std::srand(static_cast<unsigned>(std::time(nullptr))); // Khởi tạo seed ngẫu nhiên theo thời gian hiện tại
+    std::srand(static_cast<unsigned>(std::time(nullptr))); // Seed ngẫu nhiên
     for (int i = 0; i < len; ++i)
-        temp += charset[std::rand() % charset.length()]; // Chọn ngẫu nhiên từng ký tự
-    // Ép buộc đảm bảo đủ các thành phần (hoa, thường, số, đặc biệt)
+        temp += charset[std::rand() % charset.length()]; // Random ký tự bất kỳ
+
+    // Ép buộc đảm bảo mật khẩu có đủ loại ký tự (hoa, thường, số, đặc biệt)
     temp[0] = 'A';
     temp[1] = 'a';
     temp[2] = '9';
