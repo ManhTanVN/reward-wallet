@@ -9,6 +9,7 @@
 
 using json = nlohmann::json;
 
+// Đếm số lượng user đã từng nhận thưởng từ ví master
 int countUsersReceivedFromMaster(DataManager &manager)
 {
     auto users = manager.loadAllUsers();
@@ -17,6 +18,7 @@ int countUsersReceivedFromMaster(DataManager &manager)
     {
         for (const auto &log : user->getTransactionHistory())
         {
+            // Kiểm tra log có chứa giao dịch từ ví master không
             if (log.find("\"from\":\"__master__wallet__\"") != std::string::npos)
             {
                 ++count;
@@ -27,6 +29,7 @@ int countUsersReceivedFromMaster(DataManager &manager)
     return count;
 }
 
+// Hiển thị menu chính cho người dùng (chưa đăng nhập)
 void showMainMenu()
 {
     std::cout << "\n========= Reward Wallet =========\n";
@@ -37,26 +40,26 @@ void showMainMenu()
     std::cout << "Enter your choice: ";
 }
 
+// Xử lý menu chính (Register, Login, Exit)
 void handleUserInput(DataManager &manager)
 {
     int choice;
     do
     {
         showMainMenu();
-        // std::cin >> choice;
-        // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        // Đọc và validate input
         choice = getValidatedInput("Enter your choice: ", 0, 2);
         switch (choice)
         {
         case 1:
-            registerUser(manager);
+            registerUser(manager); // Đăng ký
             break;
         case 2:
         {
-            auto user = loginUser(manager);
+            auto user = loginUser(manager); // Đăng nhập
             if (user)
             {
-                showUserMenu(user, manager);
+                showUserMenu(user, manager); // Nếu thành công thì vào menu user
             }
             break;
         }
@@ -70,6 +73,7 @@ void handleUserInput(DataManager &manager)
     } while (choice != 0);
 }
 
+// Đăng ký user mới
 void registerUser(DataManager &manager)
 {
     std::string name, email, username, password;
@@ -83,16 +87,19 @@ void registerUser(DataManager &manager)
     std::cout << "Password: ";
     std::getline(std::cin, password);
 
+    // Kiểm tra độ mạnh mật khẩu
     if (!UserAccount::isPasswordValid(password))
     {
         std::cout << "Weak password.\n";
         return;
     }
 
+    // Tạo tài khoản
     auto user = std::make_shared<UserAccount>(name, email, username, password);
     user->setRole(UserRole::USER);
     manager.saveUser(user);
 
+    // Nếu trong 10 user đầu và ví master còn đủ điểm thì tặng 1000 điểm
     auto master = manager.findUser("__master__wallet__");
     if (master && countUsersReceivedFromMaster(manager) < 10 && master->getPointBalance() >= 1000)
     {
@@ -104,6 +111,8 @@ void registerUser(DataManager &manager)
 
     std::cout << "User registered successfully.\n";
 }
+
+// Đăng nhập user
 std::shared_ptr<UserAccount> loginUser(DataManager &manager)
 {
     std::string username, password;
@@ -121,6 +130,7 @@ std::shared_ptr<UserAccount> loginUser(DataManager &manager)
 
     std::cout << "Login successful. Welcome, " << user->getUsername() << "!\n";
 
+    // Nếu đang dùng mật khẩu tạm → bắt buộc đổi mật khẩu
     if (user->isUsingTempPassword())
     {
         std::cout << "You are using a temporary password. Please change it now.\n";
@@ -130,7 +140,7 @@ std::shared_ptr<UserAccount> loginUser(DataManager &manager)
     return user;
 }
 
-// Nap points
+// Nạp (mua) points từ hệ thống
 void buyPoints(std::shared_ptr<UserAccount> buyer, DataManager &manager)
 {
     int amount;
@@ -144,7 +154,7 @@ void buyPoints(std::shared_ptr<UserAccount> buyer, DataManager &manager)
         return;
     }
 
-    // Xác minh  lại mật khẩu
+    // Xác minh lại mật khẩu để chắc chắn người dùng thật sự muốn nạp
     std::string password;
     std::cout << "Re-enter your password: ";
     std::getline(std::cin, password);
@@ -154,10 +164,10 @@ void buyPoints(std::shared_ptr<UserAccount> buyer, DataManager &manager)
         return;
     }
 
-    // Xác thực OTP
+    // OTP để xác thực giao dịch mua
     std::string otp = OTPManager::generateOTP();
     buyer->setOTP(otp);
-    manager.saveUser(buyer); // Lưu OTP vào hệ thống
+    manager.saveUser(buyer);
     std::cout << "Your OTP: " << otp << "\n";
 
     std::string input;
@@ -177,10 +187,8 @@ void buyPoints(std::shared_ptr<UserAccount> buyer, DataManager &manager)
         return;
     }
 
-    // 1. Tăng điểm (mint) cho ví master
+    // B1. Mint điểm cho ví master
     master->setPointBalance(master->getPointBalance() + amount);
-
-    // Ghi log mint
     json mintLog = {
         {"amount", amount},
         {"incoming", true},
@@ -189,9 +197,9 @@ void buyPoints(std::shared_ptr<UserAccount> buyer, DataManager &manager)
         {"note", "Minted for sale"},
         {"type", "mint"}};
     master->addTransaction(mintLog.dump());
-    manager.saveUser(master); // Lưu lại điểm và log mint
+    manager.saveUser(master);
 
-    // 2. Chuyển điểm từ master sang buyer
+    // B2. Chuyển điểm từ master sang buyer
     bool success = transferPoints(manager,
                                   master->getWalletAddress(),
                                   buyer->getWalletAddress(),
@@ -201,9 +209,7 @@ void buyPoints(std::shared_ptr<UserAccount> buyer, DataManager &manager)
     if (success)
     {
         std::cout << "Purchased " << amount << " points successfully.\n";
-
-        // Reload lại buyer để cập nhật số dư mới nhất
-        buyer = manager.findUser(buyer->getUsername());
+        buyer = manager.findUser(buyer->getUsername()); // reload số dư
     }
     else
     {
@@ -211,6 +217,7 @@ void buyPoints(std::shared_ptr<UserAccount> buyer, DataManager &manager)
     }
 }
 
+// Hiển thị menu cho user/admin sau khi đăng nhập
 void showUserMenu(const std::shared_ptr<UserAccount> &user, DataManager &manager)
 {
     int choice;
@@ -218,6 +225,7 @@ void showUserMenu(const std::shared_ptr<UserAccount> &user, DataManager &manager
     {
         std::cout << "\n--- " << (user->getRole() == UserRole::ADMIN ? "[Admin]" : "[User]") << " Menu ---\n";
 
+        // Menu riêng cho Admin
         if (user->getRole() == UserRole::ADMIN)
         {
             std::cout << "1. List all users\n";
@@ -225,6 +233,7 @@ void showUserMenu(const std::shared_ptr<UserAccount> &user, DataManager &manager
             std::cout << "3. Create multiple users (bulk)\n";
         }
 
+        // Menu chung
         std::cout << "4. Change password\n";
         std::cout << "5. Show balance\n";
         std::cout << "6. Send points\n";
@@ -237,10 +246,6 @@ void showUserMenu(const std::shared_ptr<UserAccount> &user, DataManager &manager
         }
         std::cout << "0. Logout\n";
         std::cout << "============================\n";
-        std::cout << "Choice: ";
-
-        // std::cin >> choice;
-        // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         choice = getValidatedInput("Enter your choice: ", 0, 10);
 
@@ -301,6 +306,7 @@ void showUserMenu(const std::shared_ptr<UserAccount> &user, DataManager &manager
     } while (choice != 0);
 }
 
+// Liệt kê danh sách user
 void listUsers(DataManager &manager)
 {
     auto users = manager.loadAllUsers();
@@ -312,6 +318,7 @@ void listUsers(DataManager &manager)
     }
 }
 
+// Xoá user
 void deleteUser(DataManager &manager)
 {
     std::string username;
@@ -321,6 +328,7 @@ void deleteUser(DataManager &manager)
     std::cout << "Deleted (if existed).\n";
 }
 
+// Tạo nhiều user cùng lúc (Admin)
 void createMultipleUsers(DataManager &manager)
 {
     int n;
@@ -347,12 +355,14 @@ void createMultipleUsers(DataManager &manager)
         std::cout << "Username: ";
         std::getline(std::cin, username);
 
+        // Sinh mật khẩu tạm
         std::string tempPwd = UserAccount::generateTempPassword();
         auto user = std::make_shared<UserAccount>(name, email, username, tempPwd);
         user->setRole(UserRole::USER);
         user->setTempPassword(true);
         manager.saveUser(user);
 
+        // Thưởng 1000 điểm nếu nằm trong quota
         if (alreadyRewarded < 10 && master->getPointBalance() >= 1000)
         {
             if (transferPoints(manager, master->getWalletAddress(), user->getWalletAddress(), 1000, "reward"))
@@ -366,8 +376,10 @@ void createMultipleUsers(DataManager &manager)
     }
 }
 
+// Đổi mật khẩu với OTP
 void changePassword(std::shared_ptr<UserAccount> user, DataManager &manager)
 {
+    // OTP xác thực
     std::string otp = OTPManager::generateOTP();
     user->setOTP(otp);
     manager.saveUser(user);
@@ -382,6 +394,7 @@ void changePassword(std::shared_ptr<UserAccount> user, DataManager &manager)
         return;
     }
 
+    // Đổi mật khẩu
     std::string newPwd;
     std::cout << "New password: ";
     std::getline(std::cin, newPwd);
@@ -398,6 +411,7 @@ void changePassword(std::shared_ptr<UserAccount> user, DataManager &manager)
     std::cout << "Password changed.\n";
 }
 
+// Hiển thị số dư ví
 void showBalance(const std::shared_ptr<UserAccount> &user, DataManager &manager)
 {
     auto refreshedUser = manager.findUser(user->getUsername());
@@ -411,8 +425,10 @@ void showBalance(const std::shared_ptr<UserAccount> &user, DataManager &manager)
     std::cout << "Balance: " << refreshedUser->getPointBalance() << " points\n";
 }
 
+// Chuyển điểm từ user này sang user khác
 void transferPointsCLI(std::shared_ptr<UserAccount> sender, DataManager &manager)
 {
+    // Nếu không phải ví master thì bắt buộc OTP
     if (sender->getUsername() != "__master__wallet__")
     {
         std::string otp = OTPManager::generateOTP();
@@ -447,6 +463,7 @@ void transferPointsCLI(std::shared_ptr<UserAccount> sender, DataManager &manager
     }
 }
 
+// Xem lịch sử giao dịch
 void viewTransactionHistory(const std::shared_ptr<UserAccount> &user, DataManager &manager)
 {
     auto refreshedUser = manager.findUser(user->getUsername());
@@ -475,6 +492,7 @@ void viewTransactionHistory(const std::shared_ptr<UserAccount> &user, DataManage
             std::string note = log.value("note", "");
             std::string timestamp = log.value("timestamp", "");
 
+            // Format hiển thị tuỳ loại giao dịch
             if (type == "buy" && incoming)
             {
                 std::cout << "[BUY] +" << amount << " points from Master";
