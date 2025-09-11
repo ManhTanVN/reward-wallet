@@ -6,20 +6,16 @@
 ## 👥 Thành viên và phân công công việc
 - **Nguyễn Văn Tân** - Lập trình chính
   - Thiết kế cấu trúc hệ thống
-  - Hiện thực lớp `UserAccount`, `DataManager`, `CLI`
-  - Xây dựng giao diện dòng lệnh và xử lý OTP, phân quyền
+  - Hiện thực lớp `UserAccount`, `DataManager`, `Utils`
 - **Nguyễn Cảnh Tuấn** - Lập trình chính
-  - Thiết kế cấu trúc hệ thống
-  - Hiện thực lớp `UserAccount`, `DataManager`, `CLI`
-  - Xây dựng giao diện dòng lệnh và xử lý OTP, phân quyền
+  - Thiết kế user interface
+  - Hiện thực lớp `CLI`, `Main`
 - **Nguyễn Thế Linh** - Lập trình chính
-  - Thiết kế cấu trúc hệ thống
-  - Hiện thực lớp `UserAccount`, `DataManager`, `CLI`
+  - Hiện thực lớp `UserAccount`, `Sha256`
   - Xây dựng giao diện dòng lệnh và xử lý OTP, phân quyền
 - **Nguyễn Thanh Thủy** - Lập trình chính
-  - Thiết kế cấu trúc hệ thống
-  - Hiện thực lớp `UserAccount`, `DataManager`, `CLI`
-  - Xây dựng giao diện dòng lệnh và xử lý OTP, phân quyền
+  - Hiện thực lớp `Wallet`, `Utils`
+  - Kiểm thử và viết lại các comments
 
 ## 📋 Phân tích & đặc tả chức năng
 
@@ -162,5 +158,6 @@ Then Ctrl + Shift + P → CMake: Build
   "cmake.preferredGenerators": ["MinGW Makefiles"],
   "cmake.configureOnOpen": true,
   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+
 
 
